@@ -1,0 +1,115 @@
+<html>
+    <head>
+            <link href="https://fonts.googleapis.com/css?family=Mali" rel="stylesheet">
+        <style>
+            body{
+                font-family: 'Mali', cursive;
+            }
+        .flex{
+            display: flex;
+            flex-direction: row;
+        }
+        .flex>div{
+            margin: 5%;
+            flex: auto;
+        }
+        .flexy{
+            display: flex
+        }
+
+        .grid{
+            margin: 4%;
+            display: grid;
+    grid-template-columns: 200px 200px;
+    grid-gap: 10px;
+        }
+
+        .todo{
+           margin: 50px;
+           justify-content: center;
+    
+
+        }
+        </style>
+    </head>
+    <body>
+        <div class="flex todo">
+        <textarea id="todoInput"></textarea>
+        <button id="add">Add</button>
+    </div>
+        <div class="flex">
+            <div>
+                  <div>
+                        <div><h1>Todos</h1></div> 
+                        <div id="todo" ></div>
+                  </div> 
+            </div>
+            <div>
+                <h1>DELETED todos</h1>
+                <div id="deleted"></div>
+            </div>
+        </div>
+       
+        <script>
+            let todo = []
+            const createDiv= (todos,onclick, button, div)=>{
+                todos.map((to)=>{
+                        let child = document.createElement('div')
+                        child.onclick = onclick
+                        child.innerHTML = `<div class="grid"><p>${to.data}</p> <button class='delete'  id='${to.id}'>${button}</button></div>`
+                        div.appendChild(child) 
+                })
+            }
+            const isDeleted = (is , id) =>{
+                todo.map((t)=>{
+                        if(t['id'] == id){
+                            t.isDeleted = is
+                        }
+                    })
+            }
+
+            const deleteTodo = (event) =>{
+                let id= event.target && event.target.id
+                if(!id) return
+                isDeleted(true , id)
+                displayAll()
+                displayDeletedTodos()
+            }   
+            const undoTodo = (event) =>{
+                let id= event.target && event.target.id
+                if(!id) return
+                isDeleted(false, id)
+                displayAll()
+                displayDeletedTodos()
+            }
+            const displayDeletedTodos =()=>{
+                let deletedDiv = document.getElementById('deleted')
+                deletedDiv.innerHTML = ''
+                let deletedTodo  = todo.filter((t)=>{
+                        return t.isDeleted
+                })
+                createDiv(deletedTodo,undoTodo,"Undo",deletedDiv)
+            }
+            const displayAll=() =>{
+                    let todoDiv = document.getElementById('todo')
+                    todoDiv.innerHTML = ''
+                    let divElements= todo.filter((t)=>{
+                        return !t.isDeleted
+                    })
+                    createDiv(divElements,deleteTodo,"Delete",todoDiv)
+                }
+
+            document.getElementById("add").addEventListener('click',(event)=>{
+                    let textArea = document.getElementById('todoInput')
+                    let data = textArea.value
+                    todo.push({data ,
+                               id: new Date().getMilliseconds(),
+                               isDeleted:false})
+                    textArea.value = ''
+                    displayAll()
+            })
+
+            window.store = todo
+        </script>
+    </body>
+</html>
